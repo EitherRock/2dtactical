@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://dwndfint5mef5"]
+
+[ext_resource type="Script" uid="uid://cov3raxdksj7j" path="res://scenes/game.gd" id="1_lnu2h"]
+[ext_resource type="PackedScene" uid="uid://bd2umrap0bfm2" path="res://scenes/grid_map.tscn" id="1_uwrxv"]
+[ext_resource type="PackedScene" uid="uid://c50jm42lb53pt" path="res://scenes/unit.tscn" id="3_lbhrr"]
+[ext_resource type="Script" uid="uid://b352im452jq4b" path="res://scenes/mouse_camera.gd" id="4_lbhrr"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_lnu2h")
+
+[node name="GridMap" parent="." instance=ExtResource("1_uwrxv")]
+
+[node name="Units" type="Node2D" parent="."]
+
+[node name="Unit" parent="Units" instance=ExtResource("3_lbhrr")]
+position = Vector2(200, 169)
+
+[node name="Unit2" parent="Units" instance=ExtResource("3_lbhrr")]
+position = Vector2(216, 169)
+
+[node name="MouseCamera" type="Camera2D" parent="."]
+zoom = Vector2(3, 3)
+limit_left = 0
+limit_top = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.6
+drag_top_margin = 0.6
+drag_right_margin = 0.6
+drag_bottom_margin = 0.6
+script = ExtResource("4_lbhrr")
