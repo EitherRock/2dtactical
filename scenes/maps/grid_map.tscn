@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=4 uid="uid://bd2umrap0bfm2"]
+[gd_scene load_steps=6 format=4 uid="uid://bd2umrap0bfm2"]
 
-[ext_resource type="Script" uid="uid://d0uo18kwfbfrs" path="res://grid_map.gd" id="1_lgqos"]
+[ext_resource type="Script" uid="uid://d0uo18kwfbfrs" path="res://scenes/maps/grid_map.gd" id="1_lgqos"]
 [ext_resource type="Texture2D" uid="uid://gyeqnvjvusfe" path="res://graphics/Tilemap/tilemap_packed.png" id="2_w2xcp"]
-[ext_resource type="Script" uid="uid://erfala8qaloc" path="res://scenes/node_2d.gd" id="4_w2xcp"]
-[ext_resource type="Texture2D" uid="uid://cqsvooiobrmhm" path="res://graphics/Tiles/tile_0061.png" id="5_5y3cq"]
+[ext_resource type="Script" uid="uid://erfala8qaloc" path="res://scenes/maps/node_2d.gd" id="4_w2xcp"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e4pul"]
 texture = ExtResource("2_w2xcp")
@@ -339,6 +338,3 @@ default_color = Color(1, 1, 1, 0)
 script = ExtResource("4_w2xcp")
 
 [node name="PathDecorations" type="Node2D" parent="."]
-
-[node name="Cursor" type="Sprite2D" parent="."]
-texture = ExtResource("5_5y3cq")

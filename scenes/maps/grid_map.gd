@@ -3,36 +3,31 @@ extends Node2D
 @onready var ground_layer = $Ground
 @onready var path_line = $PathLine
 @onready var path_decorations = $PathDecorations
-@onready var cursor = $Cursor
 
 var astar = AStarGrid2D.new()
-var tile_size = Vector2i(16,16)
 var map_size = null
+var path_to_draw = null
 
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 
-	#var cursor_texture = preload("res://graphics/Tiles/tile_0061.png")
-	#Input.set_custom_mouse_cursor(cursor_texture, 0, Vector2(16, 16))
 	var map_used_rect: Rect2i = ground_layer.get_used_rect()
 	map_size = map_used_rect.size
 	setup_astar_grid(map_size)
 
-		
-func _process(_delta):
-	cursor.global_position = get_global_mouse_position()
 
-func setup_astar_grid(map_size):
-	astar.region = Rect2i(Vector2i.ZERO, map_size)
-	astar.cell_size = tile_size
+func setup_astar_grid(size_of_map):
+	astar.region = Rect2i(Vector2i.ZERO, size_of_map)
+	#astar.cell_size = tile_size
+	astar.cell_size = Util.tile_size
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_OCTILE
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	
 	astar.update()
 	
-	for x in range(map_size.x):
-		for y in range(map_size.y):
+	for x in range(size_of_map.x):
+		for y in range(size_of_map.y):
 			var pos = Vector2i(x,y)
 			var solid = ground_layer.get_cell_source_id(pos) == -1
 			astar.set_point_solid(pos, solid)
@@ -46,7 +41,9 @@ func draw_path(path: Array[Vector2i]) -> void:
 	clear_path_decorations()
 	
 	for tile_pos in path:
-		var centered_pos = tile_pos + tile_size / 2
+		#var centered_pos = tile_pos + Util.tile_size / 2
+		var centered_pos = Util.center_of_tile(tile_pos)
+		
 		path_line.add_point(centered_pos)
 
 	# Add arrow sprite at the last segment
@@ -66,6 +63,7 @@ func draw_path(path: Array[Vector2i]) -> void:
 				if dir_from != dir_to:
 					var corner_sprite = Sprite2D.new()
 					corner_sprite.texture = preload("res://graphics/Tiles/tile_0059.png")
+					corner_sprite.z_index = 4
 					path_decorations.add_child(corner_sprite)
 					corner_sprite.position = current_pos
 					
@@ -92,15 +90,16 @@ func draw_path(path: Array[Vector2i]) -> void:
 				else:
 					var line_sprite = Sprite2D.new()
 					line_sprite.texture = preload("res://graphics/Tiles/tile_0058.png")
+					line_sprite.z_index = 4
 					path_decorations.add_child(line_sprite)
 					line_sprite.position = current_pos
 					
-					var direction = (current_pos - previous_pos).normalized()
-					line_sprite.rotation = direction.angle() + deg_to_rad(90)
+					var line_direction = (current_pos - previous_pos).normalized()
+					line_sprite.rotation = line_direction.angle() + deg_to_rad(90)
 			
 		var arrow_sprite = Sprite2D.new()
-		#arrow_sprite.name = "ArrowSprite"
 		arrow_sprite.texture = preload("res://graphics/Tiles/tile_0043.png")
+		arrow_sprite.z_index = 4
 		path_decorations.add_child(arrow_sprite)
 
 		var last_pos = path_line.points[-1]

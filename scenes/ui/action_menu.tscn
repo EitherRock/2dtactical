@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://drm6kb6u772e6"]
+
+[ext_resource type="Script" uid="uid://4doayju0ap32" path="res://action_menu.gd" id="1_pv761"]
+
+[node name="ActionMenu" type="PopupMenu"]
+visible = true
+unfocusable = true
+script = ExtResource("1_pv761")

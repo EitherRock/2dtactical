@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://brud1ktb87uly"]
+
+[node name="InfoMenu" type="PopupMenu"]
+visible = true
+unfocusable = true
