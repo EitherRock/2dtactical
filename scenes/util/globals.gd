@@ -1,5 +1,70 @@
 extends Node
 
+
+enum UnitType {
+	INFANTRY,
+	HEAVY,
+	TANK
+}
+
+const UNIT_TYPE_NAMES = {
+	UnitType.INFANTRY: "infantry",
+	UnitType.HEAVY: "heavy",
+	UnitType.TANK: "tank",
+}
+
+const DAMAGE_TABLE = {
+	'infantry': {
+		'infantry': 55,
+		'heavy': 45,
+		'tank': -1
+	}
+}
+
+#const DAMAGE_TABLE = {
+	#"INF": {
+		#"INF": 55,
+		#"MEC": 45,
+		#"RECON": -1,
+		#"TANK": -1,
+		#"MD_TANK": -1,
+		#"APC": -1,
+	#},
+	#"MEC": {
+		#"INF": 65,
+		#"MEC": 55,
+		#"RECON": 50,
+		#"TANK": 15,
+		#"MD_TANK": 5,
+		#"APC": 45,
+	#},
+	#"TANK": {
+		#"INF": 75,
+		#"MEC": 70,
+		#"RECON": 65,
+		#"TANK": 55,
+		#"MD_TANK": 15,
+		#"APC": 70,
+	#},
+	#"MD_TANK": {
+		#"INF": 105,
+		#"MEC": 95,
+		#"RECON": 90,
+		#"TANK": 85,
+		#"MD_TANK": 55,
+		#"APC": 105,
+	#},
+	#"RECON": {
+		#"INF": 70,
+		#"MEC": 60,
+		#"RECON": 45,
+		#"TANK": 35,
+		#"MD_TANK": 6,
+		#"APC": 60,
+	#},
+#}
+
+
 var color_sprites = {
 	'done_neutral': {
 		'units': {
@@ -59,3 +124,29 @@ var color_sprites = {
 		}
 	}
 }
+
+var terrain_defense = {
+	'tree': 2,
+	'city': 3
+}
+
+
+func calculate_damage(attacker: Unit, target: Unit) -> int:
+	print('unit type', attacker.unit_type)
+	var attacker_name = UNIT_TYPE_NAMES[attacker.unit_type]
+	var target_name = UNIT_TYPE_NAMES[target.unit_type]
+	var base_percent = DAMAGE_TABLE.get(attacker_name, {}).get(target_name, -1)
+	
+	
+	if base_percent < 0:
+		return 0 # cannot attack
+		
+	var defense = target.defense
+	var hp_factor = attacker.current_health / 10.0
+	var terrain_reduction = 1.0 - (defense * 0.1)
+	var rand_bonus = randi_range(0, 9)
+	
+	var percent_damage = floor(base_percent * hp_factor * terrain_reduction) + rand_bonus
+	var hp_damage = floor(percent_damage / target.max_health)
+	
+	return clamp(hp_damage, 0, 100)

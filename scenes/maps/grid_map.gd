@@ -1,10 +1,13 @@
 extends Node2D
 
 @onready var ground_layer = $Ground
+@onready var tree_layer = $Trees
+
 @onready var path_line = $PathLine
 @onready var path_decorations = $PathDecorations
 
 var astar = AStarGrid2D.new()
+var tree_positions := {}
 var map_size = null
 var path_to_draw = null
 
@@ -29,13 +32,26 @@ func setup_astar_grid(size_of_map):
 	for x in range(size_of_map.x):
 		for y in range(size_of_map.y):
 			var pos = Vector2i(x,y)
+			
+			# Solid check
 			var solid = ground_layer.get_cell_source_id(pos) == -1
 			astar.set_point_solid(pos, solid)
+			
+			
+			# Tree tile check
+			# TODO set point weight scale for movement
+			var tree_tile_data = tree_layer.get_cell_tile_data(pos)
+			if tree_tile_data:
+				var atlas_coords = tree_layer.get_cell_atlas_coords(pos)
+				var source_id = tree_layer.get_cell_source_id(pos)
+				tree_positions[pos] = {
+					'atlas_coords': atlas_coords,
+					'source_id': source_id
+				}
 
 	astar.update()
 
 
-		
 func draw_path(path: Array[Vector2i]) -> void:
 	path_line.clear_points()
 	clear_path_decorations()
@@ -113,5 +129,18 @@ func draw_path(path: Array[Vector2i]) -> void:
 func clear_path_decorations():
 	for child in path_decorations.get_children():
 		child.queue_free()
+		
+
+func is_tree_tile(pos: Vector2i) -> bool:
+	var local_pos = tree_layer.local_to_map(Vector2(pos))
+	#return pos in tree_positions
+	return local_pos in tree_positions
+
+func get_tree_metadata(pos: Vector2i) -> Dictionary:
+	if not tree_positions.has(pos):
+		return {}
+	var info = tree_positions[pos]
+	return tree_layer.tile_set.get_custom_data(info.source_id, info.atlas_coords)
+
 
 		

@@ -20,7 +20,6 @@ func _ready():
 	if not action_menu.is_connected("unit_wait", _on_waiting):
 		action_menu.connect("unit_wait", Callable(self, "_on_waiting"))
 		
-	#combat_window.visible = false
 
 
 func _input(event):
@@ -37,8 +36,6 @@ func handle_attack_input(event):
 		var target_unit = get_unit_on_tile(target_tile)
 
 		if target_unit and selected_unit and target_unit.player_owner != selected_unit.player_owner:
-			selected_unit.attack(target_unit)
-			#combat_window.set_sides()
 			combat_window.show_combat(selected_unit, target_unit)
 			clear_unit()
 		else:
@@ -136,6 +133,10 @@ func show_arrow_path(selected_unit):
 				map.path_to_draw = path.slice(0, min(selected_unit.move_range + 1, path.size()))
 				selected_unit.previous_location = map.path_to_draw[0]
 				if not is_tile_occupied(map.path_to_draw[-1], false):
+					
+					if map.is_tree_tile(Vector2i(map.path_to_draw[-1])):
+						selected_unit.defense += Globals.terrain_defense['tree']
+						print('tree here, defense boosted')
 					selected_unit.destination = map.path_to_draw[-1]
 				else:
 					selected_unit.destination = null

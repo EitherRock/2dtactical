@@ -6,12 +6,13 @@ signal unit_moved(unit)
 
 @onready var sprite = $Sprite2D
 
-@export var unit_type := 'infantry'
+@export var unit_type := Globals.UnitType.INFANTRY
 @export var move_range := 5
-@export var max_health := 5
-@export var current_health := 5
+@export var max_health := 10
+@export var current_health := 10
 @export var attack_power := 2
-@export var defense := 1
+@export var base_defense := 1
+@export var defense := base_defense
 
 @export var done_sprite = preload("res://graphics/Tiles/tile_0106.png")
 
@@ -55,7 +56,7 @@ func set_color():
 	var color_name = get_parent().name.to_lower()
 	
 	if color_name in Globals.color_sprites:
-		var unit_texture = Globals.color_sprites[color_name]['units'].get(unit_type, null)
+		var unit_texture = Globals.color_sprites[color_name]['units'].get(Globals.UNIT_TYPE_NAMES[unit_type], null)
 		if unit_texture:
 			sprite.texture = load(unit_texture)
 	
@@ -64,14 +65,20 @@ func set_color():
 		'blue': 0,
 		'orange': 1
 	}.get(color_name, null)
+	
+	if color_name == 'orange':
+		sprite.flip_h = true
 		
-func take_damage(amount: int, attacker: Unit = null):
-	var damage = clamp(amount - defense, 1, amount)
+func take_damage(attacker: Unit = null):
+	var damage = Globals.calculate_damage(attacker, self)
+	print('damage', damage)
 	current_health -= damage
-	print("%s took %d damage. Remaining: %d" % [unit_type, damage, current_health])
+	print("%s took %d damage. Remaining: %d" % [Globals.UNIT_TYPE_NAMES[unit_type], damage, current_health])
 	
 	if current_health > 0 and attacker:
+		print('attacking attacker')
 		attack(attacker)
+		
 	#elif current_health <= 0:
 		#die()
 
@@ -83,10 +90,14 @@ func attack(target: Unit):
 	if attacked or done:
 		return
 	
-	print("%s attacks %s" % [unit_type, target.unit_type])
-	target.take_damage(attack_power)
+	print("%s attacks %s" % [Globals.UNIT_TYPE_NAMES[unit_type], Globals.UNIT_TYPE_NAMES[target.unit_type]])
 	attacked = true
-	unit_done()
+	target.take_damage(self)
+	
+	# Only mark the unit as done if its the attacking unit so defending 
+	# unit doesnt grey out after counter attack
+	if TurnManager.current_player == player_owner:
+		unit_done()
 	
 	
 	
